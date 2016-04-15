@@ -27,25 +27,27 @@ The quickest and easiest way to do this is to use prebuilt Chado schemas.
 Apollo provides a prebuilt Chado schema with the necessary ontologies. (thanks to Eric Rasche at [Center for Phage Technology, TAMU](https://cpt.tamu.edu/computer-resources/chado-prebuilt-schema/))
 
 
-Users can load this prebuilt Chado schema as follows:
+Users can load this prebuilt Chado schema to their newly created database as follows:
 ```
-scripts/load_chado_schema.sh -u <USER> -d <CHADO_DATABASE> -h <HOST> -p <PORT> -s <CHADO_SCHEMA_SQL>
+gunzip -c scripts/chado-schema-with-ontologies.sql.gz | psql -U <CHADO_USER> -d <CHADO_DATABASE> -h <HOST> -p <PORT>
 ```
+
 
 If there is already an existing database with the same name and if you would like to dump and create a clean database:
 ```
-scripts/load_chado_schema.sh -u <USER> -d <CHADO_DATABASE> -h <HOST> -p <PORT> -s <CHADO_SCHEMA_SQL> -r
+# Dump the contents of the database to a file
+pg_dump -U <CHADO_USER> -d <CHADO_DATABASE> -h <HOST> -p <PORT> -f <OUTPUT_FILE> -b
+
+# Drop the database
+dropdb <CHADO_DATABASE>
+
+# Create the database
+createdb <CHADO_DATABASE> -O <CHADO_USER>
+
+# Load the pebuilt Chado schema
+gunzip -c scripts/chado-schema-with-ontologies.sql.gz | psql -U <CHADO_USER> -d <CHADO_DATABASE> -h <HOST> -p <PORT>
 ```
 
-The '-r' flag tells the script to perform a pg_dump if `<CHADO_DATABASE>` exists.
-
-
-e.g., 
-
-```
-scripts/load_chado_schema.sh -u postgres -d apollo-chado -h localhost -p 5432 -r -s chado-schema-with-ontologies.sql.gz
-
-```
 
 The file `chado-schema-with-ontologies.sql.gz` can be found in `Apollo/scripts/` directory.
 
