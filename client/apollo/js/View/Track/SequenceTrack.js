@@ -1074,16 +1074,39 @@ var SequenceTrack = declare( "SequenceTrack", DraggableFeatureTrack,
                     alert("Cannot create overlapping sequence alterations");
                 }
                 else {
-                    var feature = '"location": { "fmin": ' + fmin + ', "fmax": ' + fmax + ', "strand": 1 }, "type": {"name": "' + type + '", "cv": { "name":"sequence" } }';
+                    var feature = {
+                        location: {
+                            fmin: fmin,
+                            fmax: fmax,
+                            strand: 1
+                        },
+                        type: {
+                            name: type,
+                            cv: {
+                                name: "sequence"
+                            }
+                        }
+                    };
                     if (type != "deletion") {
-                        feature += ', "residues": "' + input + '"';
+                        feature.residues = input;
                     }
                     if (commentFieldValue.length != 0) {
-                        feature += ', "non_reserved_properties": [{"tag": "justification", "value": "' + commentFieldValue + '" }]';
+                        feature.non_reserved_properties = [
+                            {
+                                tag: "justification",
+                                value: commentFieldValue
+                            }
+                        ];
                     }
-                    var features = '[ { ' + feature + ' } ]';
-                    var postData = '{ "track":  '+ track.getUniqueTrack()+ ', "features": ' + features + ', "operation": "add_sequence_alteration" }';
-                    track.annotTrack.executeUpdateOperation(postData);
+
+                    var features = [feature];
+                    var postData = {
+                        "track": JSON.parse(track.getUniqueTrack()),
+                        "features": features,
+                        "operation": "add_sequence_alteration",
+                        "clientToken": track.annotTrack.getClientToken()
+                    };
+                    track.annotTrack.executeUpdateOperation(JSON.stringify(postData));
                     track.annotTrack.closeDialog();
                 }
             }
